@@ -1,0 +1,66 @@
+//Reperul  Frenet 3D animat;
+
+import graph3;
+import three;
+import animate;
+import math;
+
+settings.tex="pdflatex";
+
+currentprojection=orthographic(4,4,3.25);//proiectia desenului din 3D in 2D
+
+triple r(real t)//parametrizare spirala
+{
+return (cos(2*pi*t),sin(2*pi*t),2*t);
+}
+
+//coordonatele parametrizarii trebuie declarate si independent  pt trasarea curbei
+
+ real x(real t) {return cos(2*pi*t);}
+ real y(real t){return sin(2*pi*t);}
+ real z(real t) {return 2t;}
+
+real a=2*pi;
+
+triple tang (real t)  //versor tg
+ {
+  return (-a *sin(a*t),a*cos(a*t),2)/sqrt(a*a+4);
+ }
+
+triple normalaP(real t) //versor normala princ
+{
+ return (-cos(a*t),-sin(a*t), 0);
+}
+
+triple binormala (real t)//versor binormala
+{
+return (2*sin(a*t), -2*cos(a*t), a)/sqrt(a*a+4);
+ }
+
+animation A;
+path3 p=graph(x,y,z,0,2,Spline); //declara curba ca un
+//path 3D ce se genereaza folosind aproximatia Spline, pt t\in[0,2]
+
+triple M;
+picture pic;
+size(pic, 8cm, 0);
+limits(pic,(-4,-4,-4), (4,4,4));
+
+draw(pic, p);
+
+int N=20;// numarul de frame-uri pentru animatie
+real h=2/N;
+for(int i=0;i<=N;++i)
+{
+ save();
+ currentpicture=pic.copy();
+ real t=i*h;
+ M=r(t);
+ draw(M--M+tang(t), red, Arrow3());// traseaza vectorul tg; segmentul  incepe in M si se termina in M+tang(t)
+ draw(M--M+normalaP(t), green, Arrow3());//traseaza vectorul normalei principale
+ draw(M--M+binormala(t), blue, Arrow3());//traseaza binormala
+ A.add();
+ restore();
+ }
+
+ label(A.pdf("controls"));
